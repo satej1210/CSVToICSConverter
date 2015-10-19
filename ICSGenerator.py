@@ -106,7 +106,6 @@ def getData(title=None, allDayBool=None, descr = None, startDateTime = None, end
         f=('BEGIN:VEVENT\nSUMMARY:'+title+"\nDTSTART:" + startDateTime + "\nDTEND:" + endDateTime + "\nDESCRIPTION:" + descr + "\nEND:VEVENT\n")
         return f
 def parseToDateTime(date, time):
-    print(date + " " + time)
     t = datetime.datetime.strptime(date + " " + time, "%m/%d/%Y %I:%M%p")
     return t.strftime("%Y%m%dT%H%M%S")
 def process(file=None):
@@ -127,7 +126,7 @@ def process(file=None):
             if string=="END":
                 print("Ending...")
                 break
-            m = input("Is this event alright?(Y/N) : ")
+            m = input("Is this event alright?(Y/N) [N]: ")
             if m=='Y':
                 f = open(l+'.ics', 'ba')
                 print("Writing event to ICS...\n")
@@ -142,7 +141,7 @@ def process(file=None):
         f.close()
         print("Your file has been saved as " + l + ".ics")
     else:
-        l=input("Enter output filename : ")
+        l=input("Enter output filename for "+ file + " : ")
         count=0
         with open(file) as csvfile:
             reader = csv.DictReader(csvfile)
@@ -161,7 +160,7 @@ def process(file=None):
                 else:
                     string = getData(row['Subject'], False if row['All Day Event']=="FALSE" else True , row['Description'], parseToDateTime(row['Start Date'], row['Start Time']), parseToDateTime(row['End Date'],row['End Time']))
                     f = open(l+'.ics', 'ba')
-                    print("Writing event to ICS...\n")
+                    #print("Writing event to ICS...\n")
                     f.write(bytes(string, 'UTF-8'))
                     f.close()
             f = open(l+'.ics', 'ab')
@@ -169,12 +168,16 @@ def process(file=None):
             f.close()
             print("Your file has been saved as " + l + ".ics")
 if __name__ == "__main__":
-    if len(sys.argv)==2:
-        if sys.argv[1][-4:len(sys.argv[1])]==".csv":
-            print("Woo! A CSV!\n " + sys.argv[1])
-            process(sys.argv[1])
-        else:
-            print("Please gimma a CSV file(yes, with the extension '.csv')\n")
+    if len(sys.argv)>=2:
+        for file in sys.argv[1:]:
+            if file[-4:len(file)]==".csv":
+                print("\n\n\n\n\n\nWoo! A CSV!\n " + file)
+                process(file)
+            elif file == "typeItOut":
+                print("\n\n\n\n\n\nI see you wanna type in the events with this program... Let's start!\n")
+                process()
+            else:
+                print("\n\n\n\n\n\nPlease gimma a CSV file(yes, with the extension '.csv')\nFile " + file + " ignored...\n")
     else:
-        print("I see you wanna type in the events with this program... Let's start!\n")
+        print("\n\n\n\n\n\nI see you wanna type in the events with this program... Let's start!\n")
         process()
